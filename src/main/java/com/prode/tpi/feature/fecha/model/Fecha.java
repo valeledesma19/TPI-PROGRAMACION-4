@@ -1,15 +1,26 @@
 package com.prode.tpi.feature.fecha.model;
 
-import com.prode.tpi.feature.partido.model.Partido;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
+
+import com.prode.tpi.feature.partido.model.Partido;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "fechas")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
