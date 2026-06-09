@@ -18,4 +18,6 @@ public class Equipo {
 
     @Column(unique = true)
     private String nombre;
+
 }
+
