@@ -1,6 +1,5 @@
 package com.prode.tpi.feature.usuario.model;
 
-
 import com.prode.tpi.feature.pronostico.model.Pronostico;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,4 +34,9 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Pronostico> pronosticos;
+
+    @PrePersist
+    public void prePersist() {
+        this.fechaRegistro = LocalDateTime.now();
+    }
 }
