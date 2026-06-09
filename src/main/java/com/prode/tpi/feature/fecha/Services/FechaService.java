@@ -15,7 +15,7 @@ public class FechaService {
     private FechaRepository fechaRepository;
  
     public CrearFechaResponseDto CrearFecha(CrearFechaRequestDto fechaDto) {
-        // Comprobacion para saber si en la bd esta guardado un equipo con ese nombre
+        // Comprobacion para saber si en la bd esta guardado una fecha con ese nombre
         if (fechaRepository.existsByNombre(fechaDto.getNombre())) {
             throw new RuntimeException("El nombre del equipo ya  está registrado en el sistema");
         }
