@@ -4,6 +4,7 @@ import com.prode.tpi.feature.auth.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -26,18 +32,39 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-
+                        .requestMatchers(HttpMethod.GET, "/api/Fecha/Listar").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Endpoints de Fecha que requieren ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/Fecha/Crear").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/Fecha/Modificar/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/Fecha/Eliminar/**").hasRole("ADMIN")
+
+                        // Resto de endpoints de Fecha (ej: listar) quedan públicos
                         .requestMatchers("/api/Fecha/**").permitAll()
                         .requestMatchers("/api/equipos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/Partido/ActualizarEstado/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
