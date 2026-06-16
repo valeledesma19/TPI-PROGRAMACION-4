@@ -1,0 +1,194 @@
+/* ===== FONDO GENERAL AUTH ===== */
+.auth-container {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  position: relative;
+
+  background:
+    linear-gradient(
+      rgba(7, 15, 35, 0.82),
+      rgba(7, 15, 35, 0.92)
+    ),
+    url("/Gemini_Generated_Image_ymtynaymtynaymty.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== BOTÓN VOLVER ===== */
+.back-button {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+
+  padding: 11px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(14px);
+
+  color: white;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.back-button:hover {
+  background: rgba(30, 41, 59, 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25);
+}
+
+/* ===== CARD LOGIN / REGISTER ===== */
+.auth-card {
+  width: 430px;
+  padding: 42px;
+
+  border-radius: 22px;
+
+  background: rgba(15, 23, 42, 0.76);
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.45),
+    0 0 28px rgba(37, 99, 235, 0.18);
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  animation: fadeIn 0.5s ease;
+}
+
+/* ===== TÍTULO ===== */
+.auth-card h1 {
+  text-align: center;
+  color: white;
+
+  font-size: 2rem;
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+
+/* ===== INPUTS ===== */
+.auth-card input {
+  width: 100%;
+
+  padding: 14px 15px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+  font-size: 1rem;
+
+  outline: none;
+
+  transition: 0.25s;
+}
+
+.auth-card input::placeholder {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.auth-card input:focus {
+  border-color: #38bdf8;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+/* ===== BOTÓN PRINCIPAL ===== */
+.auth-card button {
+  width: 100%;
+
+  margin-top: 8px;
+  padding: 14px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+
+  color: white;
+
+  font-size: 1rem;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+}
+
+.auth-card button:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 0 22px rgba(56, 189, 248, 0.38);
+}
+
+/* ===== ERROR / TEXTO EXTRA ===== */
+.auth-error {
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+
+  color: #fecaca;
+
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.auth-footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+/* ===== ANIMACIÓN ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 520px) {
+  .auth-card {
+    width: 100%;
+    padding: 32px 24px;
+  }
+
+  .back-button {
+    top: 14px;
+    left: 14px;
+  }
+}

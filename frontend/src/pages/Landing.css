@@ -1,0 +1,200 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+.landing{
+    min-height:100vh;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,0.55),
+            rgba(0,0,0,0.55)
+        ),
+        url("/Gemini_Generated_Image_ymtynaymtynaymty.png");
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+
+    padding-right:120px;
+}
+
+.content{
+
+    width:550px;
+
+    padding:45px;
+
+    border-radius:25px;
+
+    background:rgba(0,0,0,0.35);
+
+    backdrop-filter:blur(8px);
+
+    color:white;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.4);
+}
+
+.badge{
+
+    display:inline-block;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,0.15);
+
+    border:1px solid rgba(255,255,255,0.3);
+
+    margin-bottom:25px;
+
+    font-size:14px;
+
+    font-weight:bold;
+}
+
+.content h1{
+
+    font-size:4.2rem;
+
+    line-height:0.95;
+
+    color:#e5e7eb;
+
+    font-weight:900;
+
+    margin-bottom:20px;
+
+    text-transform:uppercase;
+}
+
+.subtitle{
+
+    font-size:1.1rem;
+
+    line-height:1.7;
+
+    color:#e5e7eb;
+
+    margin-bottom:35px;
+}
+
+.buttons{
+
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.btn-login{
+
+    width:100%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#38bdf8;
+
+    color:white;
+
+    font-size:1rem;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.btn-login:hover{
+
+    transform:translateY(-3px);
+
+    background:#0ea5e9;
+}
+
+.btn-register{
+
+    width:100%;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    border:2px solid white;
+
+    background:transparent;
+
+    color:white;
+
+    font-size:1rem;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.btn-register:hover{
+
+    background:white;
+
+    color:black;
+
+    transform:translateY(-3px);
+}
+
+@media (max-width:768px){
+
+    .landing{
+
+        justify-content:center;
+
+        padding:20px;
+    }
+
+    .content{
+
+        width:100%;
+    }
+
+    .content h1{
+
+        font-size:3rem;
+    }
+}
+.back-button{
+    position:absolute;
+    top:20px;
+    left:20px;
+
+    background:white;
+    border:none;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+.back-button:hover{
+    transform:translateY(-2px);
+}
