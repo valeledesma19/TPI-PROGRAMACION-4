@@ -45,7 +45,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/Fecha/**").permitAll()
 
                         .requestMatchers("/api/equipos/**").hasRole("ADMIN")
+
+                        .requestMatchers("/api/partidos/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.PUT, "/api/Partido/ActualizarEstado/**").hasRole("ADMIN")
+
 
                         .anyRequest().authenticated()
                 )
