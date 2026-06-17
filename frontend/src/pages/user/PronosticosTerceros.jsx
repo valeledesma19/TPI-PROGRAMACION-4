@@ -1,61 +1,48 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import Sidebar from "../../components/Sidebar";
+import { apiFetch } from "../../utils/api";
+import "../Dashboard.css";
+import "../AdminCrud.css";
 import "./PronosticosTerceros.css";
 
 function PronosticosTerceros() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
+  const [partidos, setPartidos] = useState([]);
   const [partidoId, setPartidoId] = useState("");
   const [pronosticos, setPronosticos] = useState([]);
   const [mensaje, setMensaje] = useState("");
 
+  const cargarPartidos = async () => {
+    try {
+      const data = await apiFetch("/partidos");
+      setPartidos(data);
+    } catch (error) {
+      setMensaje(error.message);
+    }
+  };
+
+  useEffect(() => {
+    cargarPartidos();
+  }, []);
+
   const consultarPronosticos = async () => {
-    if (!partidoId.trim()) {
-      setMensaje("Ingresá el ID del partido.");
+    if (!partidoId) {
+      setMensaje("Seleccioná un partido.");
       return;
     }
 
-    const res = await fetch(
-      `http://localhost:8080/api/pronosticos/partido/${partidoId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (!res.ok) {
+    try {
+      const data = await apiFetch(`/pronosticos/partido/${partidoId}`);
+      setPronosticos(data);
+      setMensaje("");
+    } catch (error) {
       setPronosticos([]);
-      setMensaje("No se pueden ver todavía o el partido no existe.");
-      return;
+      setMensaje(error.message);
     }
-
-    const data = await res.json();
-    setPronosticos(data);
-    setMensaje("");
   };
 
   return (
     <div className="dashboard-bg">
-      <aside className="sidebar">
-        <h1 className="logo">PR⚽DE</h1>
-
-        <button className="side-item" onClick={() => navigate("/user")}>
-          Dashboard
-        </button>
-
-        <button className="side-item" onClick={() => navigate("/user/pronosticos")}>
-          Mis Pronósticos
-        </button>
-
-        <button className="side-item active">
-          Pronósticos de Terceros
-        </button>
-
-        <button className="side-item">Ranking</button>
-        <button className="side-item">Partidos</button>
-      </aside>
+      <Sidebar type="USER" active="terceros" />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -70,28 +57,29 @@ function PronosticosTerceros() {
           <div className="admin-user">Usuario</div>
         </header>
 
-        <section className="terceros-grid">
-          <div className="dash-card big">
-            <h3>Buscar por partido</h3>
-            <p>Ingresá el ID del partido para consultar los pronósticos disponibles.</p>
+        {mensaje && <div className="crud-message">{mensaje}</div>}
 
-            <div className="terceros-form">
-              <input
-                type="number"
-                placeholder="ID del partido"
-                value={partidoId}
-                onChange={(e) => setPartidoId(e.target.value)}
-              />
+        <section className="dash-card crud-card">
+          <h3>Buscar por partido</h3>
 
-              <button onClick={consultarPronosticos}>
-                Consultar
-              </button>
-            </div>
+          <div className="crud-form">
+            <select
+              value={partidoId}
+              onChange={(e) => setPartidoId(e.target.value)}
+            >
+              <option value="">Seleccionar partido</option>
 
-            {mensaje && <p className="terceros-error">{mensaje}</p>}
+              {partidos.map((p) => (
+                <option key={p.idPartido} value={p.idPartido}>
+                  {p.nombreEquipoLocal} vs {p.nombreEquipoVisitante} | {p.nombreFecha} | {p.estado}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={consultarPronosticos}>
+              Consultar pronósticos
+            </button>
           </div>
-
-
         </section>
 
         <section className="dash-card resultados-card">

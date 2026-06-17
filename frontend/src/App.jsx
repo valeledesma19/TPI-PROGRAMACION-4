@@ -7,11 +7,16 @@ import Home from "./pages/Home";
 
 import Admin from "./pages/Admin";
 import User from "./pages/User";
+
 import Equipos from "./pages/admin/Equipos";
+import Fechas from "./pages/admin/Fechas";
+import AdminPartidos from "./pages/admin/AdminPartidos";
+
+import UserPartidos from "./pages/user/UserPartidos.jsx";
 import Pronosticos from "./pages/user/Pronosticos";
+import PronosticosTerceros from "./pages/user/PronosticosTerceros";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-import PronosticosTerceros from "./pages/user/PronosticosTerceros";
 
 function App() {
   return (
@@ -23,7 +28,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
 
-        {/* ADMIN */}
         <Route
           path="/admin"
           element={
@@ -42,7 +46,24 @@ function App() {
           }
         />
 
-        {/* USER */}
+        <Route
+          path="/admin/fechas"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <Fechas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/partidos"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <AdminPartidos />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/user"
           element={
@@ -51,6 +72,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/user/partidos"
+          element={
+            <ProtectedRoute role="USER">
+              <UserPartidos />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/user/pronosticos"
           element={
@@ -59,6 +90,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/user/pronosticos-terceros"
           element={

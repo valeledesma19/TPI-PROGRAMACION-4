@@ -34,20 +34,19 @@ function Register() {
       alert("Usuario registrado correctamente");
       navigate("/login");
 
-    } catch (err) {
+    } catch {
       setError("Error de conexión con el servidor");
     }
   };
 
   return (
     <div className="auth-container">
-
       <div className="auth-card">
 
         <h1>Crear Cuenta</h1>
 
         {error && (
-          <p style={{ color: "red", textAlign: "center" }}>
+          <p className="auth-error">
             {error}
           </p>
         )}

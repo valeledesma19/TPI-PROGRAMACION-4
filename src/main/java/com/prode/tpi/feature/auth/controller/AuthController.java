@@ -28,8 +28,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequest dto) {
-        String token = authService.login(dto);
-        return ResponseEntity.ok(new LoginResponseDto(token));
+        return ResponseEntity.ok(authService.login(dto));
     }
     @PostMapping("/create-admin")
     public ResponseEntity<Usuario> createAdmin(@RequestBody RegisterRequest dto) {

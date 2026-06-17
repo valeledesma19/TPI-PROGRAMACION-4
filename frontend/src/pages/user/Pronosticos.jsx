@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import Sidebar from "../../components/Sidebar";
+import { apiFetch } from "../../utils/api";
+import { getUserFromToken } from "../../utils/auth";
+import "../Dashboard.css";
+import "../AdminCrud.css";
 import "./Pronosticos.css";
 
 function Pronosticos() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
-  const usuarioId = localStorage.getItem("usuarioId");
+  const user = getUserFromToken();
+  const usuarioId = user?.idUsuario || localStorage.getItem("usuarioId");
 
   const [partidos, setPartidos] = useState([]);
   const [pronosticosAgrupados, setPronosticosAgrupados] = useState({
@@ -21,17 +23,13 @@ function Pronosticos() {
   const [golesVisitante, setGolesVisitante] = useState("");
   const [mensaje, setMensaje] = useState("");
 
-  const API = "http://localhost:8080/api";
-
   const cargarPartidos = async () => {
-    const res = await fetch(`${API}/partidos`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (!res.ok) return;
-
-    const data = await res.json();
-    setPartidos(data);
+    try {
+      const data = await apiFetch("/partidos");
+      setPartidos(data);
+    } catch (error) {
+      setMensaje(error.message);
+    }
   };
 
   const cargarMisPronosticos = async () => {
@@ -40,24 +38,17 @@ function Pronosticos() {
       return;
     }
 
-    const res = await fetch(`${API}/pronosticos/usuario/${usuarioId}/agrupados`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      const data = await apiFetch(`/pronosticos/usuario/${usuarioId}/agrupados`);
 
-    if (!res.ok) {
-      setMensaje("No se pudieron cargar tus pronósticos.");
-      return;
+      setPronosticosAgrupados({
+        porJugarse: data.porJugarse || [],
+        enJuego: data.enJuego || [],
+        finalizado: data.finalizado || [],
+      });
+    } catch (error) {
+      setMensaje(error.message);
     }
-
-    const data = await res.json();
-
-    setPronosticosAgrupados({
-      porJugarse: data.porJugarse || [],
-      enJuego: data.enJuego || [],
-      finalizado: data.finalizado || [],
-    });
-
-    setMensaje("");
   };
 
   useEffect(() => {
@@ -81,31 +72,25 @@ function Pronosticos() {
       return;
     }
 
-    const res = await fetch(`${API}/pronosticos/${usuarioId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        partidoId: Number(partidoSeleccionado),
-        golesLocalPredicho: Number(golesLocal),
-        golesVisitantePredicho: Number(golesVisitante),
-      }),
-    });
+    try {
+      await apiFetch(`/pronosticos/${usuarioId}`, {
+        method: "POST",
+        body: JSON.stringify({
+          partidoId: Number(partidoSeleccionado),
+          golesLocalPredicho: Number(golesLocal),
+          golesVisitantePredicho: Number(golesVisitante),
+        }),
+      });
 
-    if (!res.ok) {
-      setMensaje(
-        "No se pudo guardar. El partido debe estar por jugarse y faltar más de 30 minutos."
-      );
-      return;
+      setPartidoSeleccionado("");
+      setGolesLocal("");
+      setGolesVisitante("");
+      setMensaje("Pronóstico guardado correctamente.");
+
+      cargarMisPronosticos();
+    } catch (error) {
+      setMensaje(error.message);
     }
-
-    setPartidoSeleccionado("");
-    setGolesLocal("");
-    setGolesVisitante("");
-    setMensaje("Pronóstico guardado correctamente.");
-    cargarMisPronosticos();
   };
 
   const pronosticosFiltrados = () => {
@@ -120,27 +105,21 @@ function Pronosticos() {
     ];
   };
 
+  const partidosDisponibles = partidos.filter(
+    (p) => p.estado === "POR_JUGARSE"
+  );
+
+  const obtenerNombrePartido = (partidoId) => {
+    const partido = partidos.find((p) => p.idPartido === partidoId);
+
+    if (!partido) return `Partido #${partidoId}`;
+
+    return `${partido.nombreEquipoLocal} vs ${partido.nombreEquipoVisitante}`;
+  };
+
   return (
     <div className="dashboard-bg">
-      <aside className="sidebar">
-        <h1 className="logo">PR⚽DE</h1>
-
-        <button className="side-item" onClick={() => navigate("/user")}>
-          Dashboard
-        </button>
-
-        <button className="side-item active">Mis Pronósticos</button>
-
-        <button
-          className="side-item"
-          onClick={() => navigate("/user/pronosticos-terceros")}
-        >
-          Pronósticos de Terceros
-        </button>
-
-        <button className="side-item">Ranking</button>
-        <button className="side-item">Partidos</button>
-      </aside>
+      <Sidebar type="USER" active="pronosticos" />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -152,12 +131,12 @@ function Pronosticos() {
           <div className="admin-user">Usuario</div>
         </header>
 
-        {mensaje && <div className="pronostico-message">{mensaje}</div>}
+        {mensaje && <div className="crud-message">{mensaje}</div>}
 
         <section className="pronosticos-top">
           <div className="dash-card pronostico-crear">
             <h3>Crear o modificar pronóstico</h3>
-            <p>Seleccioná un partido y cargá el resultado que querés predecir.</p>
+            <p>Seleccioná un partido por jugarse y cargá tu predicción.</p>
 
             <div className="pronostico-form">
               <select
@@ -166,9 +145,9 @@ function Pronosticos() {
               >
                 <option value="">Seleccionar partido</option>
 
-                {partidos.map((p) => (
+                {partidosDisponibles.map((p) => (
                   <option key={p.idPartido} value={p.idPartido}>
-                    {p.equipoLocal?.nombre} vs {p.equipoVisitante?.nombre}
+                    {p.nombreEquipoLocal} vs {p.nombreEquipoVisitante} | {p.nombreFecha} | {p.fechaHoraInicio?.replace("T", " ")}
                   </option>
                 ))}
               </select>
@@ -191,7 +170,9 @@ function Pronosticos() {
                 />
               </div>
 
-              <button onClick={guardarPronostico}>Guardar pronóstico</button>
+              <button onClick={guardarPronostico}>
+                Guardar pronóstico
+              </button>
             </div>
           </div>
 
@@ -248,7 +229,7 @@ function Pronosticos() {
               pronosticosFiltrados().map((p) => (
                 <div className="pronostico-card" key={p.idPronostico}>
                   <div>
-                    <strong>Partido #{p.partidoId}</strong>
+                    <strong>{obtenerNombrePartido(p.partidoId)}</strong>
                     <p>Pronóstico propio</p>
                   </div>
 

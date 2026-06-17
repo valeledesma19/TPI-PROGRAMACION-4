@@ -15,7 +15,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.prode.tpi.feature.partido.dto.ResultadoPartidoRequestDto;
+import com.prode.tpi.feature.partido.model.TendenciaResultado;
+import com.prode.tpi.feature.pronostico.model.Pronostico;
+import com.prode.tpi.feature.pronostico.repositories.PronosticoRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,8 @@ public class PartidoServiceImpl implements PartidoService {
     private final PartidoRepository partidoRepository;
     private final EquipoRepository equipoRepository;
     private final FechaRepository fechaRepository;
+    private final PronosticoRepository pronosticoRepository;
+
 
     // ── RF4.1 Registro ────────────────────────────────────────────────────────
 
@@ -110,6 +115,44 @@ public class PartidoServiceImpl implements PartidoService {
 
         return toResponseDto(partido);
     }
+    @Override
+    @Transactional
+    public PartidoResponseDto cargarResultado(Long id, ResultadoPartidoRequestDto request) {
+
+        Partido partido = obtenerOLanzar(id);
+
+        if (partido.getEstado() != EstadoPartido.EN_JUEGO) {
+            throw new IllegalStateException(
+                    "Solo se puede cargar resultado a un partido en estado EN_JUEGO."
+            );
+        }
+
+        partido.setGolesLocal(request.getGolesLocal());
+        partido.setGolesVisitante(request.getGolesVisitante());
+
+        TendenciaResultado tendenciaReal = calcularTendencia(
+                request.getGolesLocal(),
+                request.getGolesVisitante()
+        );
+
+        partido.setTendenciaResultado(tendenciaReal);
+        partido.setEstado(EstadoPartido.FINALIZADO);
+
+        Partido partidoGuardado = partidoRepository.save(partido);
+
+        List<Pronostico> pronosticos = pronosticoRepository.findByPartido(partidoGuardado);
+
+        for (Pronostico pronostico : pronosticos) {
+            int puntos = calcularPuntos(pronostico, partidoGuardado);
+            pronostico.setPuntosObtenidos(puntos);
+        }
+
+        pronosticoRepository.saveAll(pronosticos);
+
+        actualizarEstadoFecha(partidoGuardado.getFecha());
+
+        return toResponseDto(partidoGuardado);
+    }
 
     // ── RF4.4 Consulta ────────────────────────────────────────────────────────
 
@@ -165,6 +208,62 @@ public class PartidoServiceImpl implements PartidoService {
         }
     }
 
+    private TendenciaResultado calcularTendencia(Integer golesLocal, Integer golesVisitante) {
+        if (golesLocal > golesVisitante) {
+            return TendenciaResultado.LOCAL;
+        }
+
+        if (golesLocal < golesVisitante) {
+            return TendenciaResultado.VISITANTE;
+        }
+
+        return TendenciaResultado.EMPATE;
+    }
+
+    private int calcularPuntos(Pronostico pronostico, Partido partido) {
+
+        boolean exacto =
+                pronostico.getGolesLocalPredicho().equals(partido.getGolesLocal())
+                        && pronostico.getGolesVisitantePredicho().equals(partido.getGolesVisitante());
+
+        if (exacto) {
+            return 3;
+        }
+
+        TendenciaResultado tendenciaPronostico = calcularTendencia(
+                pronostico.getGolesLocalPredicho(),
+                pronostico.getGolesVisitantePredicho()
+        );
+
+        if (tendenciaPronostico == partido.getTendenciaResultado()) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private void actualizarEstadoFecha(Fecha fecha) {
+
+        List<Partido> partidos = partidoRepository
+                .findByFecha_IdFechaOrderByFechaHoraInicioAsc(fecha.getIdFecha());
+
+        boolean todosFinalizados = partidos.stream()
+                .allMatch(p -> p.getEstado() == EstadoPartido.FINALIZADO);
+
+        boolean algunoEnJuego = partidos.stream()
+                .anyMatch(p -> p.getEstado() == EstadoPartido.EN_JUEGO);
+
+        if (!partidos.isEmpty() && todosFinalizados) {
+            fecha.setEstado(EstadoFecha.FINALIZADA);
+        } else if (algunoEnJuego) {
+            fecha.setEstado(EstadoFecha.EN_JUEGO);
+        } else {
+            fecha.setEstado(EstadoFecha.PROGRAMADA);
+        }
+
+        fechaRepository.save(fecha);
+    }
+
     // ── Mapper ────────────────────────────────────────────────────────────────
 
     private PartidoResponseDto toResponseDto(Partido partido) {
@@ -172,6 +271,9 @@ public class PartidoServiceImpl implements PartidoService {
                 .idPartido(partido.getIdPartido())
                 .fechaHoraInicio(partido.getFechaHoraInicio())
                 .estado(partido.getEstado())
+                .golesLocal(partido.getGolesLocal())
+                .golesVisitante(partido.getGolesVisitante())
+                .tendenciaResultado(partido.getTendenciaResultado())
                 .idFecha(partido.getFecha().getIdFecha())
                 .nombreFecha(partido.getFecha().getNombre())
                 .idEquipoLocal(partido.getEquipoLocal().getIdEquipo())

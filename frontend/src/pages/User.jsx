@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 import "./Dashboard.css";
 
 function User() {
@@ -6,28 +7,13 @@ function User() {
 
   return (
     <div className="dashboard-bg">
-      <aside className="sidebar">
-        <h1 className="logo">PR⚽DE</h1>
-
-        <button className="side-item active">Dashboard</button>
-
-        <button className="side-item" onClick={() => navigate("/user/pronosticos")}>
-          Mis Pronósticos
-        </button>
-
-        <button className="side-item" onClick={() => navigate("/user/pronosticos-terceros")}>
-          Pronósticos de Terceros
-        </button>
-
-        <button className="side-item">Ranking</button>
-        <button className="side-item">Partidos</button>
-      </aside>
+      <Sidebar type="USER" active="dashboard" />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
           <div>
             <h2>Panel de Usuario</h2>
-            <p>Gestioná tus pronósticos y consultá predicciones de otros usuarios.</p>
+            <p>Consultá partidos, cargá pronósticos y mirá predicciones de terceros.</p>
           </div>
 
           <div className="admin-user">Usuario</div>
@@ -40,31 +26,37 @@ function User() {
 
             <div className="stats">
               <div>
-                <strong>15</strong>
+                <strong>RF4</strong>
+                <span>Partidos</span>
+              </div>
+
+              <div>
+                <strong>RF5.1</strong>
                 <span>Pronósticos</span>
               </div>
 
               <div>
-                <strong>42</strong>
-                <span>Puntos</span>
-              </div>
-
-              <div>
-                <strong>7°</strong>
-                <span>Ranking</span>
+                <strong>RF5.3</strong>
+                <span>Terceros</span>
               </div>
             </div>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/user/partidos")}>
+            <h3>Partidos</h3>
+            <p>Listá los partidos disponibles del sistema.</p>
+            <button>Ver partidos</button>
           </div>
 
           <div className="dash-card" onClick={() => navigate("/user/pronosticos")}>
             <h3>Mis Pronósticos</h3>
             <p>Crear, modificar y consultar tus predicciones.</p>
-            <button>Ir a Mis Pronósticos</button>
+            <button>Ir a pronósticos</button>
           </div>
 
           <div className="dash-card" onClick={() => navigate("/user/pronosticos-terceros")}>
             <h3>Pronósticos de Terceros</h3>
-            <p>Consultá qué predijeron otros usuarios para un partido.</p>
+            <p>Consultá qué predijeron otros usuarios.</p>
             <button>Ver terceros</button>
           </div>
         </section>

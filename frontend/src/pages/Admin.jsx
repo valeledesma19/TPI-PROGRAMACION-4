@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 import "./Dashboard.css";
 
 function Admin() {
@@ -6,17 +7,7 @@ function Admin() {
 
   return (
     <div className="dashboard-bg">
-      <aside className="sidebar">
-        <h1 className="logo">PR⚽DE</h1>
-
-        <button className="side-item active">Dashboard</button>
-        <button className="side-item" onClick={() => navigate("/admin/equipos")}>
-          Equipos
-        </button>
-        <button className="side-item">Partidos</button>
-        <button className="side-item">Fechas</button>
-        <button className="side-item">Ranking</button>
-      </aside>
+      <Sidebar type="ADMIN" active="dashboard" />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -31,20 +22,22 @@ function Admin() {
         <section className="dashboard-grid">
           <div className="dash-card big">
             <h3>Resumen del sistema</h3>
-            <p>Administrá equipos, partidos, fechas y resultados.</p>
+            <p>Administrá equipos, fechas, partidos y resultados.</p>
 
             <div className="stats">
               <div>
-                <strong>18</strong>
+                <strong>RF2</strong>
                 <span>Equipos</span>
               </div>
+
               <div>
-                <strong>980</strong>
-                <span>Usuarios</span>
-              </div>
-              <div>
-                <strong>12</strong>
+                <strong>RF3</strong>
                 <span>Fechas</span>
+              </div>
+
+              <div>
+                <strong>RF4</strong>
+                <span>Partidos</span>
               </div>
             </div>
           </div>
@@ -55,10 +48,16 @@ function Admin() {
             <button>Gestionar equipos</button>
           </div>
 
-          <div className="dash-card">
+          <div className="dash-card" onClick={() => navigate("/admin/fechas")}>
+            <h3>Fechas</h3>
+            <p>Crear, modificar, listar y eliminar fechas.</p>
+            <button>Gestionar fechas</button>
+          </div>
+
+          <div className="dash-card" onClick={() => navigate("/admin/partidos")}>
             <h3>Partidos</h3>
-            <p>Administración de partidos del torneo.</p>
-            <button>Próximamente</button>
+            <p>Crear, modificar, eliminar y pasar partidos a en juego.</p>
+            <button>Gestionar partidos</button>
           </div>
         </section>
       </main>

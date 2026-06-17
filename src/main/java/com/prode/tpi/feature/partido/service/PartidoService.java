@@ -3,7 +3,7 @@ package com.prode.tpi.feature.partido.service;
 import com.prode.tpi.feature.partido.dto.PartidoRequestDto;
 import com.prode.tpi.feature.partido.dto.PartidoResponseDto;
 import com.prode.tpi.feature.partido.dto.PartidoUpdateRequestDto;
-
+import com.prode.tpi.feature.partido.dto.ResultadoPartidoRequestDto;
 import java.util.List;
 
 public interface PartidoService {
@@ -22,7 +22,11 @@ public interface PartidoService {
 
     PartidoResponseDto obtenerPartidoPorId(Long id);
 
+    PartidoResponseDto cargarResultado(Long id, ResultadoPartidoRequestDto request);
+
     // RF4.5
     void eliminarPartido(Long id);
+
+
 
 }

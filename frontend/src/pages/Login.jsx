@@ -29,30 +29,29 @@ function Login() {
       const data = await res.json();
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("usuarioId", data.idUsuario);
+      localStorage.setItem("email", data.email);
+      localStorage.setItem("rol", data.rol);
 
-      const payload = JSON.parse(atob(data.token.split(".")[1]));
-      localStorage.setItem("rol", payload.rol);
-
-      if (payload.rol === "ADMIN") {
+      if (data.rol === "ADMIN") {
         navigate("/admin");
       } else {
         navigate("/user");
       }
 
-    } catch (err) {
+    } catch {
       setError("Error de conexión con el servidor");
     }
   };
 
   return (
     <div className="auth-container">
-
       <div className="auth-card">
 
         <h1>Iniciar Sesión</h1>
 
         {error && (
-          <p style={{ color: "red", textAlign: "center" }}>
+          <p className="auth-error">
             {error}
           </p>
         )}
