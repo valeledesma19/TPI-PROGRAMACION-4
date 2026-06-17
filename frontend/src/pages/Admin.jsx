@@ -23,23 +23,6 @@ function Admin() {
           <div className="dash-card big">
             <h3>Resumen del sistema</h3>
             <p>Administrá equipos, fechas, partidos y resultados.</p>
-
-            <div className="stats">
-              <div>
-                <strong>RF2</strong>
-                <span>Equipos</span>
-              </div>
-
-              <div>
-                <strong>RF3</strong>
-                <span>Fechas</span>
-              </div>
-
-              <div>
-                <strong>RF4</strong>
-                <span>Partidos</span>
-              </div>
-            </div>
           </div>
 
           <div className="dash-card" onClick={() => navigate("/admin/equipos")}>

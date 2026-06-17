@@ -17,6 +17,8 @@ import Pronosticos from "./pages/user/Pronosticos";
 import PronosticosTerceros from "./pages/user/PronosticosTerceros";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Ranking from "./pages/Ranking.jsx";
+import UserFechas from "./pages/user/UserFechas.jsx";
 
 function App() {
   return (
@@ -96,6 +98,22 @@ function App() {
           element={
             <ProtectedRoute role="USER">
               <PronosticosTerceros />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ranking"
+          element={
+            <ProtectedRoute>
+              <Ranking />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/fechas"
+          element={
+            <ProtectedRoute role="USER">
+              <UserFechas />
             </ProtectedRoute>
           }
         />

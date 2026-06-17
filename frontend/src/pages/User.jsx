@@ -23,23 +23,6 @@ function User() {
           <div className="dash-card big">
             <h3>Bienvenido al PRODE</h3>
             <p>Realizá predicciones, sumá puntos y competí en el ranking.</p>
-
-            <div className="stats">
-              <div>
-                <strong>RF4</strong>
-                <span>Partidos</span>
-              </div>
-
-              <div>
-                <strong>RF5.1</strong>
-                <span>Pronósticos</span>
-              </div>
-
-              <div>
-                <strong>RF5.3</strong>
-                <span>Terceros</span>
-              </div>
-            </div>
           </div>
 
           <div className="dash-card" onClick={() => navigate("/user/partidos")}>

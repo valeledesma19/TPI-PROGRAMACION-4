@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/Fecha/**").permitAll()
 
                         .requestMatchers("/api/equipos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/ranking/**").authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/api/partidos/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/partidos/**").hasRole("ADMIN")
@@ -66,13 +67,22 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:5174"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 

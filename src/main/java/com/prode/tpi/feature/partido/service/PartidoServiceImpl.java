@@ -21,6 +21,9 @@ import com.prode.tpi.feature.pronostico.model.Pronostico;
 import com.prode.tpi.feature.pronostico.repositories.PronosticoRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.prode.tpi.feature.pronostico.model.Pronostico;
+import com.prode.tpi.feature.pronostico.repositories.PronosticoRepository;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,7 @@ public class PartidoServiceImpl implements PartidoService {
     private final EquipoRepository equipoRepository;
     private final FechaRepository fechaRepository;
     private final PronosticoRepository pronosticoRepository;
+
 
 
     // ── RF4.1 Registro ────────────────────────────────────────────────────────
@@ -71,7 +75,8 @@ public class PartidoServiceImpl implements PartidoService {
 
         if (partido.getEstado() != EstadoPartido.POR_JUGARSE) {
             throw new IllegalStateException(
-                    "Solo se puede modificar un partido en estado POR_JUGARSE.");
+                    "Solo se puede modificar un partido en estado POR_JUGARSE."
+            );
         }
 
         validarEquiposDistintos(request.getIdEquipoLocal(), request.getIdEquipoVisitante());
@@ -83,6 +88,12 @@ public class PartidoServiceImpl implements PartidoService {
         Equipo visitante = equipoRepository.findById(request.getIdEquipoVisitante())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Equipo visitante no encontrado con id: " + request.getIdEquipoVisitante()));
+
+        List<Pronostico> pronosticosDelPartido = pronosticoRepository.findByPartido(partido);
+
+        if (!pronosticosDelPartido.isEmpty()) {
+            pronosticoRepository.deleteAll(pronosticosDelPartido);
+        }
 
         partido.setFechaHoraInicio(request.getFechaHoraInicio());
         partido.setEquipoLocal(local);
@@ -100,30 +111,33 @@ public class PartidoServiceImpl implements PartidoService {
 
         if (partido.getEstado() != EstadoPartido.POR_JUGARSE) {
             throw new IllegalStateException(
-                    "Solo se puede pasar a EN_JUEGO un partido que esté POR_JUGARSE.");
+                    "Solo se puede pasar a EN_JUEGO un partido que esté POR_JUGARSE."
+            );
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        if (ahora.isBefore(partido.getFechaHoraInicio())) {
+            throw new IllegalStateException(
+                    "No se puede pasar el partido a EN_JUEGO antes de la fecha y hora programada."
+            );
         }
 
         partido.setEstado(EstadoPartido.EN_JUEGO);
-        partidoRepository.save(partido);
+        Partido guardado = partidoRepository.save(partido);
 
-        // Actualizar estado de la Fecha contenedora (RF3.3)
-        Fecha fecha = partido.getFecha();
-        if (fecha.getEstado() != EstadoFecha.EN_JUEGO) {
-            fecha.setEstado(EstadoFecha.EN_JUEGO);
-            fechaRepository.save(fecha);
-        }
+        actualizarEstadoFecha(partido.getFecha());
 
-        return toResponseDto(partido);
+        return toResponseDto(guardado);
     }
     @Override
     @Transactional
     public PartidoResponseDto cargarResultado(Long id, ResultadoPartidoRequestDto request) {
-
         Partido partido = obtenerOLanzar(id);
 
         if (partido.getEstado() != EstadoPartido.EN_JUEGO) {
             throw new IllegalStateException(
-                    "Solo se puede cargar resultado a un partido en estado EN_JUEGO."
+                    "Solo se puede cargar resultado a un partido en estado EN_JUEGO. Si ya está FINALIZADO, no se puede corregir."
             );
         }
 

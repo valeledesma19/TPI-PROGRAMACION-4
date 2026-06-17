@@ -73,6 +73,15 @@ function AdminPartidos() {
     });
   };
 
+  const puedePasarAEnJuego = (partido) => {
+    if (!partido.fechaHoraInicio) return false;
+
+    const ahora = new Date();
+    const fechaPartido = new Date(partido.fechaHoraInicio);
+
+    return ahora >= fechaPartido;
+  };
+
   const guardarPartido = async () => {
     if (!form.fechaHoraInicio || !form.idEquipoLocal || !form.idEquipoVisitante) {
       setMensaje("Completá los datos del partido.");
@@ -91,6 +100,12 @@ function AdminPartidos() {
 
     try {
       if (editandoId) {
+        const confirmar = confirm(
+          "Si modificás este partido, se eliminarán todos los pronósticos cargados para este partido. ¿Querés continuar?"
+        );
+
+        if (!confirmar) return;
+
         await apiFetch(`/partidos/${editandoId}`, {
           method: "PUT",
           body: JSON.stringify({
@@ -100,7 +115,7 @@ function AdminPartidos() {
           }),
         });
 
-        setMensaje("Partido modificado correctamente.");
+        setMensaje("Partido modificado correctamente. Los pronósticos anteriores fueron eliminados.");
       } else {
         await apiFetch("/partidos", {
           method: "POST",
@@ -134,9 +149,14 @@ function AdminPartidos() {
     });
   };
 
-  const pasarAEnJuego = async (id) => {
+  const pasarAEnJuego = async (partido) => {
+    if (!puedePasarAEnJuego(partido)) {
+      setMensaje("No se puede pasar a EN JUEGO antes de la fecha y hora programada.");
+      return;
+    }
+
     try {
-      await apiFetch(`/partidos/${id}/en-juego`, {
+      await apiFetch(`/partidos/${partido.idPartido}/en-juego`, {
         method: "PATCH",
       });
 
@@ -172,7 +192,7 @@ function AdminPartidos() {
         }),
       });
 
-      setMensaje("Resultado cargado correctamente. El partido finalizó y se calcularon los puntos.");
+      setMensaje("Resultado cargado correctamente. El partido finalizó y no podrá corregirse.");
       limpiarResultado();
       cargarDatos();
     } catch (error) {
@@ -214,6 +234,12 @@ function AdminPartidos() {
 
         <section className="dash-card crud-card">
           <h3>{editandoId ? "Modificar partido" : "Crear partido"}</h3>
+
+          {editandoId && (
+            <p className="empty">
+              Atención: al modificar este partido se eliminarán los pronósticos existentes.
+            </p>
+          )}
 
           <div className="crud-form form-grid">
             {!editandoId && (
@@ -278,7 +304,9 @@ function AdminPartidos() {
         {resultadoId && (
           <section className="dash-card crud-card">
             <h3>Cargar resultado real</h3>
-            <p>Solo se puede cargar resultado si el partido está EN_JUEGO.</p>
+            <p className="empty">
+              Una vez cargado el resultado, el partido quedará FINALIZADO y no podrá corregirse.
+            </p>
 
             <div className="crud-form form-grid">
               <input
@@ -359,6 +387,12 @@ function AdminPartidos() {
                       Inicio: {p.fechaHoraInicio?.replace("T", " ")}
                     </p>
 
+                    {p.estado === "POR_JUGARSE" && !puedePasarAEnJuego(p) && (
+                      <p>
+                        No se puede pasar a EN JUEGO hasta la fecha y hora programada.
+                      </p>
+                    )}
+
                     {p.estado === "FINALIZADO" && (
                       <p>
                         Resultado: {p.golesLocal} - {p.golesVisitante} | Tendencia: {p.tendenciaResultado}
@@ -373,9 +407,11 @@ function AdminPartidos() {
                           Editar
                         </button>
 
-                        <button onClick={() => pasarAEnJuego(p.idPartido)}>
-                          Pasar a en juego
-                        </button>
+                        {puedePasarAEnJuego(p) && (
+                          <button onClick={() => pasarAEnJuego(p)}>
+                            Pasar a en juego
+                          </button>
+                        )}
 
                         <button
                           className="danger"

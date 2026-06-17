@@ -37,6 +37,13 @@ function Sidebar({ type, active }) {
           >
             Partidos
           </button>
+
+          <button
+            className={`side-item ${active === "ranking" ? "active" : ""}`}
+            onClick={() => navigate("/ranking")}
+          >
+            Ranking
+          </button>
         </>
       )}
 
@@ -47,6 +54,13 @@ function Sidebar({ type, active }) {
             onClick={() => navigate("/user")}
           >
             Dashboard
+          </button>
+
+          <button
+            className={`side-item ${active === "fechas" ? "active" : ""}`}
+            onClick={() => navigate("/user/fechas")}
+          >
+            Fechas
           </button>
 
           <button
@@ -70,7 +84,10 @@ function Sidebar({ type, active }) {
             Pronósticos de Terceros
           </button>
 
-          <button className="side-item">
+          <button
+            className={`side-item ${active === "ranking" ? "active" : ""}`}
+            onClick={() => navigate("/ranking")}
+          >
             Ranking
           </button>
         </>
