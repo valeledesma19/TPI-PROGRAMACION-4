@@ -1,6 +1,7 @@
 package com.prode.tpi.feature.auth.service;
 
 import com.prode.tpi.feature.auth.dto.LoginRequest;
+import com.prode.tpi.feature.auth.dto.LoginResponseDto;
 import com.prode.tpi.feature.auth.dto.RegisterRequest;
 import com.prode.tpi.feature.auth.security.JwtService;
 import com.prode.tpi.feature.usuario.model.Rol;
@@ -39,7 +40,7 @@ public class AuthService {
     }
 
     //  RF1.2 LOGIN
-    public String login(LoginRequest dto) {
+    public LoginResponseDto login(LoginRequest dto) {
 
         Usuario usuario = usuarioRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -48,7 +49,14 @@ public class AuthService {
             throw new RuntimeException("Credenciales inválidas");
         }
 
-        return jwtService.generateToken(
+        String token = jwtService.generateToken(
+                usuario.getEmail(),
+                usuario.getRol().name()
+        );
+
+        return new LoginResponseDto(
+                token,
+                usuario.getIdUsuario(),
                 usuario.getEmail(),
                 usuario.getRol().name()
         );

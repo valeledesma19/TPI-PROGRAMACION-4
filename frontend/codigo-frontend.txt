@@ -1,0 +1,588 @@
+﻿
+==============================
+ARCHIVO: Navbar.jsx
+==============================
+
+import { useNavigate } from "react-router-dom";
+import { getUserFromToken } from "../utils/auth";
+
+function Navbar() {
+  const navigate = useNavigate();
+  const user = getUserFromToken();
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  return (
+    <div style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
+
+      <button onClick={() => navigate("/home")}>Home</button>
+
+      {/* ðŸ”¥ ADMIN MENU */}
+      {user?.rol === "ADMIN" && (
+        <>
+          <button onClick={() => navigate("/admin")}>
+            Panel Admin
+          </button>
+
+          <button onClick={() => navigate("/admin/equipos")}>
+            Equipos
+          </button>
+        </>
+      )}
+
+      {/* ðŸ‘¤ USER MENU */}
+      {user?.rol === "USER" && (
+        <>
+          <button onClick={() => navigate("/user")}>
+            Panel Usuario
+          </button>
+        </>
+      )}
+
+      {/* LOGOUT */}
+      <button onClick={logout} style={{ marginLeft: "20px" }}>
+        Cerrar sesiÃ³n
+      </button>
+    </div>
+  );
+}
+
+export default Navbar;
+
+==============================
+ARCHIVO: ProtectedRoute.jsx
+==============================
+
+import { Navigate } from "react-router-dom";
+
+function ProtectedRoute({ children, role }) {
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("rol");
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (role && userRole !== role) {
+    return <Navigate to="/home" />;
+  }
+
+  return children;
+}
+
+export default ProtectedRoute;
+
+==============================
+ARCHIVO: Equipos.jsx
+==============================
+
+import { useEffect, useState } from "react";
+import { getUserFromToken } from "../../utils/auth";
+
+function Equipos() {
+  const [equipos, setEquipos] = useState([]);
+  const [nombre, setNombre] = useState("");
+  const [busqueda, setBusqueda] = useState("");
+
+  const token = localStorage.getItem("token");
+  const user = getUserFromToken();
+
+  const API = "http://localhost:8080/api/equipos";
+
+  // ðŸ”µ RF2.2 LISTAR / BUSCAR
+  const fetchEquipos = async (filtro = "") => {
+    const url = filtro ? `${API}?nombre=${filtro}` : API;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      console.error("Error al traer equipos");
+      return;
+    }
+
+    const data = await res.json();
+    setEquipos(data);
+  };
+
+  useEffect(() => {
+    fetchEquipos();
+  }, []);
+
+  // ðŸŸ¢ RF2.1 CREAR
+  const crearEquipo = async () => {
+    if (!nombre.trim()) return;
+
+    await fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nombre }),
+    });
+
+    setNombre("");
+    fetchEquipos();
+  };
+
+  // ðŸ”´ RF2.3 ELIMINAR
+  const eliminarEquipo = async (id) => {
+    const res = await fetch(`${API}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      alert("No se puede eliminar (puede estar asociado a partidos)");
+      return;
+    }
+
+    fetchEquipos();
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>âš½ GestiÃ³n de Equipos</h1>
+
+      {/* ðŸ”’ SOLO ADMIN */}
+      {user?.rol !== "ADMIN" && (
+        <p>No tenÃ©s permisos para ver esto</p>
+      )}
+
+      {user?.rol === "ADMIN" && (
+        <>
+          {/* RF2.1 CREAR */}
+          <div style={{ marginBottom: "20px" }}>
+            <h3>Crear equipo</h3>
+
+            <input
+              placeholder="Ej: Boca Juniors"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+            />
+
+            <button onClick={crearEquipo}>
+              Crear
+            </button>
+          </div>
+
+          {/* RF2.2 BUSCAR */}
+          <div style={{ marginBottom: "20px" }}>
+            <input
+              placeholder="Buscar equipo..."
+              value={busqueda}
+              onChange={(e) => {
+                setBusqueda(e.target.value);
+                fetchEquipos(e.target.value);
+              }}
+            />
+          </div>
+
+          {/* LISTA */}
+          <ul>
+            {equipos.map((eq) => (
+              <li key={eq.idEquipo}>
+                {eq.nombre}
+
+                <button
+                  onClick={() => eliminarEquipo(eq.idEquipo)}
+                  style={{ marginLeft: "10px" }}
+                >
+                  âŒ
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default Equipos;
+
+==============================
+ARCHIVO: Admin.jsx
+==============================
+
+function Admin() {
+  const token = localStorage.getItem("token");
+
+  return (
+    <div>
+      <h1>Panel ADMIN ðŸ”¥</h1>
+
+      <p>Solo administradores pueden ver esto</p>
+
+      <textarea rows="5" cols="80" value={token || ""} readOnly />
+    </div>
+  );
+}
+
+export default Admin;
+
+==============================
+ARCHIVO: Home.jsx
+==============================
+
+function Home() {
+  const token = localStorage.getItem("token");
+  const rol = localStorage.getItem("rol");
+
+  const logout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
+
+  return (
+    <div>
+      <h1>Prode TPI</h1>
+
+      <h2>
+        Rol: {rol}
+      </h2>
+
+      {rol === "ADMIN" ? (
+        <p>Panel de administrador ðŸ”¥ (puede gestionar equipos)</p>
+      ) : (
+        <p>Panel de usuario ðŸ‘¤ (puede hacer pronÃ³sticos)</p>
+      )}
+
+      <p>Token:</p>
+
+      <textarea rows="5" cols="80" value={token || ""} readOnly />
+
+      <br /><br />
+
+      <button onClick={logout}>
+        Cerrar sesiÃ³n
+      </button>
+    </div>
+  );
+}
+
+export default Home;
+
+==============================
+ARCHIVO: Landing.jsx
+==============================
+
+import { useNavigate } from "react-router-dom";
+import "./Landing.css";
+
+function Landing() {
+
+    const navigate = useNavigate();
+
+    return (
+        <div className="landing">
+
+            <div className="content">
+
+                <span className="badge">
+                     PRODE 2026
+                </span>
+
+                <h1>
+                    PRODE<br />
+                </h1>
+
+                <p className="subtitle">
+                    RealizÃ¡ tus pronÃ³sticos, competÃ­ contra otros usuarios
+                    y escalÃ¡ posiciones en el ranking.
+                </p>
+
+                <div className="buttons">
+
+                    <button
+                        className="btn-login"
+                        onClick={() => navigate("/login")}
+                    >
+                        Iniciar SesiÃ³n
+                    </button>
+
+                    <button
+                        className="btn-register"
+                        onClick={() => navigate("/register")}
+                    >
+                        Registrarse
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    );
+}
+
+export default Landing;
+
+==============================
+ARCHIVO: Login.jsx
+==============================
+
+import { useState } from "react";
+import "./Auth.css";
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        alert("Credenciales invÃ¡lidas");
+        return;
+      }
+
+      const data = await res.json();
+      const token = data.token;
+
+      // guardo token
+      localStorage.setItem("token", token);
+
+      // decodifico rol (SIN librerÃ­a, simple)
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const rol = payload.rol;
+
+      localStorage.setItem("rol", rol);
+
+      // redirijo segÃºn rol
+      if (rol === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/user");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexiÃ³n");
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <button className="back-button" onClick={() => navigate("/")}>
+        ðŸ  Inicio
+      </button>
+
+      <div className="auth-card">
+        <h1>Iniciar SesiÃ³n</h1>
+
+        <input
+          type="email"
+          placeholder="Correo electrÃ³nico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="ContraseÃ±a"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button onClick={handleLogin}>
+          Ingresar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default Login;
+
+==============================
+ARCHIVO: Register.jsx
+==============================
+
+import { useState } from "react";
+import "./Auth.css";
+import { useNavigate } from "react-router-dom";
+
+
+function Register() {
+
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  return (
+    <div className="auth-container">
+
+        <button className="back-button" onClick={() => navigate("/")}>
+            ðŸ  Inicio
+        </button>
+
+      <div className="auth-card">
+
+        <h1>Crear Cuenta</h1>
+
+        <input
+          type="text"
+          placeholder="Nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+        />
+
+        <input
+          type="email"
+          placeholder="Correo electrÃ³nico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="ContraseÃ±a"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button>Registrarse</button>
+
+      </div>
+
+    </div>
+  );
+}
+
+export default Register;
+
+==============================
+ARCHIVO: User.jsx
+==============================
+
+function User() {
+  const token = localStorage.getItem("token");
+
+  return (
+    <div>
+      <h1>Panel USER ðŸ‘¤</h1>
+
+      <p>Bienvenido usuario del sistema</p>
+
+      <textarea rows="5" cols="80" value={token || ""} readOnly />
+    </div>
+  );
+}
+
+export default User;
+
+==============================
+ARCHIVO: Auth.jsx
+==============================
+
+export function getUserFromToken() {
+  const token = localStorage.getItem("token");
+
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload; // { sub, rol, iat, exp }
+  } catch (e) {
+    return null;
+  }
+}
+
+==============================
+ARCHIVO: App.jsx
+==============================
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
+import User from "./pages/User";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import Equipos from "./pages/admin/Equipos";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Home />} />
+
+        {/* ðŸ”¥ ADMIN DASHBOARD */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* âš½ EQUIPOS */}
+        <Route
+          path="/admin/equipos"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <Equipos />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ðŸ‘¤ USER */}
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute role="USER">
+              <User />
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+==============================
+ARCHIVO: main.jsx
+==============================
+
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+

@@ -1,0 +1,284 @@
+/* =========================
+   FONDO GENERAL
+========================= */
+
+.dashboard-bg {
+  min-height: 100vh;
+  display: flex;
+
+  background:
+    linear-gradient(
+      rgba(7, 15, 35, .82),
+      rgba(7, 15, 35, .92)
+    ),
+    url("/Gemini_Generated_Image_ymtynaymtynaymty.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+  width: 250px;
+
+  padding: 30px 20px;
+
+  background: rgba(15, 23, 42, .75);
+
+  backdrop-filter: blur(18px);
+
+  border-right: 1px solid rgba(255,255,255,.08);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* LOGO */
+
+.logo {
+  color: #38bdf8;
+
+  font-size: 2rem;
+  font-weight: bold;
+
+  text-align: center;
+
+  margin-bottom: 40px;
+}
+
+/* ITEMS */
+
+.side-item {
+  padding: 14px 16px;
+
+  margin-bottom: 10px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: white;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  transition: .3s;
+}
+
+.side-item:hover {
+  background: rgba(255,255,255,.08);
+}
+
+.side-item.active {
+  background: rgba(37,99,235,.35);
+
+  border: 1px solid rgba(56,189,248,.3);
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+
+.dashboard-main {
+  flex: 1;
+
+  padding: 40px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+
+  margin-bottom: 35px;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  color:white;
+}
+
+.dashboard-header p {
+  color: rgba(255,255,255,.7);
+  margin-top: 6px;
+}
+
+.admin-user {
+  padding: 12px 18px;
+
+  border-radius: 14px;
+
+  background: rgba(255,255,255,.08);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* =========================
+   GRID
+========================= */
+
+.dashboard-grid {
+  display: grid;
+
+  grid-template-columns:
+    2fr
+    1fr
+    1fr;
+
+  gap: 20px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.dash-card {
+  padding: 24px;
+
+  border-radius: 20px;
+
+  background: rgba(15,23,42,.75);
+
+  backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.25);
+
+  transition: .3s;
+
+  cursor: pointer;
+}
+
+.dash-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 0 20px rgba(56,189,248,.25),
+    0 10px 30px rgba(0,0,0,.35);
+}
+
+.dash-card h3 {
+  margin-bottom: 10px;
+}
+
+.dash-card p {
+  color: rgba(255,255,255,.75);
+
+  line-height: 1.5;
+}
+
+/* CARD GRANDE */
+
+.big {
+  min-height: 250px;
+}
+
+/* =========================
+   BOTONES
+========================= */
+
+.dash-card button {
+  margin-top: 20px;
+
+  padding: 12px 18px;
+
+  border: none;
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #38bdf8,
+      #2563eb
+    );
+
+  color: white;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: .3s;
+}
+
+.dash-card button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 0 20px rgba(56,189,248,.35);
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats {
+  display: flex;
+
+  gap: 25px;
+
+  margin-top: 30px;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats strong {
+  font-size: 2rem;
+}
+
+.stats span {
+  color: rgba(255,255,255,.7);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .dashboard-bg {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+}
