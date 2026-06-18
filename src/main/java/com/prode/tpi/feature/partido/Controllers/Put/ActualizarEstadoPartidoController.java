@@ -1,4 +1,4 @@
-package com.prode.tpi.feature.partido.Controller.Put;
+package com.prode.tpi.feature.partido.Controllers.Put;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

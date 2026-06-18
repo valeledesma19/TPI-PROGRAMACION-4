@@ -42,6 +42,12 @@ function User() {
             <p>Consultá qué predijeron otros usuarios.</p>
             <button>Ver terceros</button>
           </div>
+
+          <div className="dash-card" onClick={() => navigate("/user/estadisticas")}>
+            <h3>Mis Estadísticas</h3>
+            <p>Plenos, aciertos, puntos y efectividad acumulada.</p>
+            <button>Ver estadísticas</button>
+          </div>
         </section>
       </main>
     </div>

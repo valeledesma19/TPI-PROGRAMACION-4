@@ -20,6 +20,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Ranking from "./pages/Ranking.jsx";
 import UserFechas from "./pages/user/UserFechas.jsx";
 
+import MisEstadisticas from "./pages/user/MisEstadisticas";
+
 function App() {
   return (
     <BrowserRouter>
@@ -114,6 +116,15 @@ function App() {
           element={
             <ProtectedRoute role="USER">
               <UserFechas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user/estadisticas"
+          element={
+            <ProtectedRoute role="USER">
+              <MisEstadisticas />
             </ProtectedRoute>
           }
         />

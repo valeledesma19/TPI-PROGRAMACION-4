@@ -44,6 +44,8 @@ function Sidebar({ type, active }) {
           >
             Ranking
           </button>
+
+          
         </>
       )}
 
@@ -89,6 +91,13 @@ function Sidebar({ type, active }) {
             onClick={() => navigate("/ranking")}
           >
             Ranking
+          </button>
+
+          <button
+            className={`side-item ${active === "estadisticas" ? "active" : ""}`}
+            onClick={() => navigate("/user/estadisticas")}
+          >
+            Mis Estadísticas
           </button>
         </>
       )}
