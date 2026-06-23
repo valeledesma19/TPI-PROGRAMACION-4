@@ -49,7 +49,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/partidos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PATCH, "/api/partidos/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/partidos/**").hasRole("ADMIN")
-                .requestMatchers("/api/pronosticos/**").hasRole("USER")
+
+                                .requestMatchers(HttpMethod.GET, "/api/pronosticos/admin/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/pronosticos/partido/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/pronosticos/usuario/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST, "/api/pronosticos/**").hasRole("USER")
                 .requestMatchers(HttpMethod.GET, "/api/estadisticas/**").hasRole("USER")
                 .requestMatchers(HttpMethod.PUT, "/api/Partido/ActualizarEstado/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

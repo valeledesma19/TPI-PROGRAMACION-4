@@ -14,11 +14,11 @@ public class PronosticoResponseDto {
     private Long idPronostico;
 
     private Long usuarioId;
+    private String nombreUsuario;
 
     private Long partidoId;
 
     private Integer golesLocalPredicho;
-
     private Integer golesVisitantePredicho;
 
     private Integer puntosObtenidos;

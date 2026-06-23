@@ -149,3 +149,158 @@
     min-width: 100%;
   }
 }
+.partido-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.partido-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.arrow-btn {
+  background: rgba(56, 189, 248, 0.18) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+}
+
+.pronosticos-inline {
+  width: 100%;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.pronosticos-inline h4 {
+  margin-bottom: 12px;
+  color: white;
+}
+
+.pronostico-inline-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+
+  padding: 13px 15px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pronostico-inline-card p {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.pronostico-inline-resultado {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pronostico-inline-resultado span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.16);
+  color: #bae6fd;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .partido-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pronostico-inline-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pronostico-inline-resultado {
+    flex-wrap: wrap;
+  }
+}
+.pronosticos-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 11px 16px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(14, 165, 233, 0.22),
+    rgba(37, 99, 235, 0.28)
+  );
+
+  color: #e0f2fe;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pronosticos-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(125, 211, 252, 0.8);
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.35);
+  background: linear-gradient(
+    135deg,
+    rgba(14, 165, 233, 0.35),
+    rgba(37, 99, 235, 0.42)
+  );
+}
+
+.pronosticos-btn.open {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.25),
+    rgba(14, 165, 233, 0.28)
+  );
+  border-color: rgba(74, 222, 128, 0.55);
+  color: #dcfce7;
+}
+
+.pronosticos-icon {
+  width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.pronosticos-count {
+  min-width: 22px;
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 7px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+
+  font-size: 12px;
+  font-weight: 800;
+}

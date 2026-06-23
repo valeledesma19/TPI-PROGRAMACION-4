@@ -14,6 +14,9 @@ function AdminPartidos() {
   const [editandoId, setEditandoId] = useState(null);
   const [resultadoId, setResultadoId] = useState(null);
 
+  const [partidoAbiertoId, setPartidoAbiertoId] = useState(null);
+  const [pronosticosPorPartido, setPronosticosPorPartido] = useState({});
+
   const [form, setForm] = useState({
     idFecha: "",
     fechaHoraInicio: "",
@@ -216,6 +219,41 @@ function AdminPartidos() {
     }
   };
 
+  const togglePronosticos = async (partido) => {
+    if (partidoAbiertoId === partido.idPartido) {
+      setPartidoAbiertoId(null);
+      return;
+    }
+
+    setPartidoAbiertoId(partido.idPartido);
+
+    if (pronosticosPorPartido[partido.idPartido]) {
+      return;
+    }
+
+    try {
+      const data = await apiFetch(`/pronosticos/admin/partido/${partido.idPartido}`);
+
+      setPronosticosPorPartido({
+        ...pronosticosPorPartido,
+        [partido.idPartido]: data,
+      });
+
+      setMensaje("");
+    } catch (error) {
+      setPronosticosPorPartido({
+        ...pronosticosPorPartido,
+        [partido.idPartido]: [],
+      });
+
+      setMensaje(error.message);
+    }
+  };
+
+  const fechasProgramadas = fechas.filter(
+    (fecha) => fecha.estado === "PROGRAMADA"
+  );
+
   return (
     <div className="dashboard-bg">
       <Sidebar type="ADMIN" active="partidos" />
@@ -224,7 +262,7 @@ function AdminPartidos() {
         <header className="dashboard-header">
           <div>
             <h2>Gestión de Partidos</h2>
-            <p>Crear, modificar, eliminar, iniciar partidos y cargar resultados.</p>
+            <p>Crear, modificar, eliminar, iniciar partidos, cargar resultados y ver pronósticos.</p>
           </div>
 
           <div className="admin-user">Administrador</div>
@@ -243,18 +281,26 @@ function AdminPartidos() {
 
           <div className="crud-form form-grid">
             {!editandoId && (
-              <select
-                value={form.idFecha}
-                onChange={(e) => cambiarForm("idFecha", e.target.value)}
-              >
-                <option value="">Seleccionar fecha</option>
+              <>
+                <select
+                  value={form.idFecha}
+                  onChange={(e) => cambiarForm("idFecha", e.target.value)}
+                >
+                  <option value="">Seleccionar fecha</option>
 
-                {fechas.map((fecha) => (
-                  <option key={fecha.idFecha} value={fecha.idFecha}>
-                    {fecha.nombre} - {fecha.estado}
-                  </option>
-                ))}
-              </select>
+                  {fechasProgramadas.map((fecha) => (
+                    <option key={fecha.idFecha} value={fecha.idFecha}>
+                      {fecha.nombre} - {fecha.estado}
+                    </option>
+                  ))}
+                </select>
+
+                {fechasProgramadas.length === 0 && (
+                  <p className="empty">
+                    No hay fechas programadas disponibles para crear partidos.
+                  </p>
+                )}
+              </>
             )}
 
             <input
@@ -304,6 +350,7 @@ function AdminPartidos() {
         {resultadoId && (
           <section className="dash-card crud-card">
             <h3>Cargar resultado real</h3>
+
             <p className="empty">
               Una vez cargado el resultado, el partido quedará FINALIZADO y no podrá corregirse.
             </p>
@@ -372,70 +419,137 @@ function AdminPartidos() {
             {partidos.length === 0 ? (
               <p className="empty">No hay partidos para mostrar.</p>
             ) : (
-              partidos.map((p) => (
-                <div className="crud-item" key={p.idPartido}>
-                  <div>
-                    <strong>
-                      {p.nombreEquipoLocal} vs {p.nombreEquipoVisitante}
-                    </strong>
+              partidos.map((p) => {
+                const estaAbierto = partidoAbiertoId === p.idPartido;
+                const pronosticos = pronosticosPorPartido[p.idPartido] || [];
 
-                    <p>
-                      Fecha: {p.nombreFecha} | Estado: {p.estado}
-                    </p>
+                return (
+                  <div className="crud-item partido-item" key={p.idPartido}>
+                    <div className="partido-row">
+                      <div>
+                        <strong>
+                          {p.nombreEquipoLocal} vs {p.nombreEquipoVisitante}
+                        </strong>
 
-                    <p>
-                      Inicio: {p.fechaHoraInicio?.replace("T", " ")}
-                    </p>
+                        <p>
+                          Fecha: {p.nombreFecha} | Estado: {p.estado}
+                        </p>
 
-                    {p.estado === "POR_JUGARSE" && !puedePasarAEnJuego(p) && (
-                      <p>
-                        No se puede pasar a EN JUEGO hasta la fecha y hora programada.
-                      </p>
-                    )}
+                        <p>
+                          Inicio: {p.fechaHoraInicio?.replace("T", " ")}
+                        </p>
 
-                    {p.estado === "FINALIZADO" && (
-                      <p>
-                        Resultado: {p.golesLocal} - {p.golesVisitante} | Tendencia: {p.tendenciaResultado}
-                      </p>
-                    )}
-                  </div>
+                        {p.estado === "POR_JUGARSE" && !puedePasarAEnJuego(p) && (
+                          <p>
+                            No se puede pasar a EN JUEGO hasta la fecha y hora programada.
+                          </p>
+                        )}
 
-                  <div className="crud-actions">
-                    {p.estado === "POR_JUGARSE" && (
-                      <>
-                        <button onClick={() => prepararEdicion(p)}>
-                          Editar
+                        {p.estado === "FINALIZADO" && (
+                          <p>
+                            Resultado: {p.golesLocal} - {p.golesVisitante} | Tendencia: {p.tendenciaResultado}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="crud-actions">
+                        <button
+                          className={`pronosticos-btn ${estaAbierto ? "open" : ""}`}
+                          onClick={() => togglePronosticos(p)}
+                        >
+                          <span className="pronosticos-icon">
+                            {estaAbierto ? "⌄" : "›"}
+                          </span>
+
+                          <span>
+                            {estaAbierto ? "Ocultar" : "Ver"} pronósticos
+                          </span>
+
+                          {pronosticosPorPartido[p.idPartido] && (
+                            <span className="pronosticos-count">
+                              {pronosticosPorPartido[p.idPartido].length}
+                            </span>
+                          )}
                         </button>
 
-                        {puedePasarAEnJuego(p) && (
-                          <button onClick={() => pasarAEnJuego(p)}>
-                            Pasar a en juego
+                        {p.estado === "POR_JUGARSE" && (
+                          <>
+                            <button onClick={() => prepararEdicion(p)}>
+                              Editar
+                            </button>
+
+                            {puedePasarAEnJuego(p) && (
+                              <button onClick={() => pasarAEnJuego(p)}>
+                                Pasar a en juego
+                              </button>
+                            )}
+
+                            <button
+                              className="danger"
+                              onClick={() => eliminarPartido(p.idPartido)}
+                            >
+                              Eliminar
+                            </button>
+                          </>
+                        )}
+
+                        {p.estado === "EN_JUEGO" && (
+                          <button onClick={() => prepararResultado(p)}>
+                            Cargar resultado
                           </button>
                         )}
 
-                        <button
-                          className="danger"
-                          onClick={() => eliminarPartido(p.idPartido)}
-                        >
-                          Eliminar
-                        </button>
-                      </>
-                    )}
+                        {p.estado === "FINALIZADO" && (
+                          <span className="estado-pronostico">
+                            Finalizado
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-                    {p.estado === "EN_JUEGO" && (
-                      <button onClick={() => prepararResultado(p)}>
-                        Cargar resultado
-                      </button>
-                    )}
+                    {estaAbierto && (
+                      <div className="pronosticos-inline">
+                        <h4>Pronósticos cargados</h4>
 
-                    {p.estado === "FINALIZADO" && (
-                      <span className="estado-pronostico">
-                        Finalizado
-                      </span>
+                        {pronosticos.length === 0 ? (
+                          <p className="empty">
+                            Este partido todavía no tiene pronósticos.
+                          </p>
+                        ) : (
+                          pronosticos.map((pronostico) => (
+                            <div
+                              className="pronostico-inline-card"
+                              key={pronostico.idPronostico}
+                            >
+                              <div>
+                                <strong>
+                                  {pronostico.nombreUsuario || `Usuario #${pronostico.usuarioId}`}
+                                </strong>
+
+                                <p>
+                                  Fecha de carga:{" "}
+                                  {pronostico.fechaCreacion?.replace("T", " ")}
+                                </p>
+                              </div>
+
+                              <div className="pronostico-inline-resultado">
+                                <span>
+                                  {pronostico.golesLocalPredicho} -{" "}
+                                  {pronostico.golesVisitantePredicho}
+                                </span>
+
+                                <span>
+                                  {pronostico.puntosObtenidos ?? 0} pts
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </section>

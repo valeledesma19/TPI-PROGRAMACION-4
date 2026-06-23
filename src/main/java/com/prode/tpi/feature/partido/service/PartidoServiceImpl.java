@@ -46,6 +46,20 @@ public class PartidoServiceImpl implements PartidoService {
         Fecha fecha = fechaRepository.findById(request.getIdFecha())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Fecha no encontrada con id: " + request.getIdFecha()));
+        if (fecha.getEstado() != EstadoFecha.PROGRAMADA) {
+            throw new IllegalStateException(
+                    "Solo se pueden crear partidos en fechas que estén PROGRAMADAS."
+            );
+        }
+        if (partidoRepository.existePartidoIgualEnFecha(
+                fecha.getIdFecha(),
+                request.getIdEquipoLocal(),
+                request.getIdEquipoVisitante()
+        )) {
+            throw new IllegalStateException(
+                    "Ya existe un partido entre estos equipos en la misma fecha."
+            );
+        }
 
         Equipo local = equipoRepository.findById(request.getIdEquipoLocal())
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -81,6 +95,17 @@ public class PartidoServiceImpl implements PartidoService {
 
         validarEquiposDistintos(request.getIdEquipoLocal(), request.getIdEquipoVisitante());
 
+        if (partidoRepository.existePartidoIgualEnFechaExcluyendoPartido(
+                partido.getFecha().getIdFecha(),
+                partido.getIdPartido(),
+                request.getIdEquipoLocal(),
+                request.getIdEquipoVisitante()
+        )) {
+            throw new IllegalStateException(
+                    "Ya existe un partido entre estos equipos en la misma fecha."
+            );
+        }
+
         Equipo local = equipoRepository.findById(request.getIdEquipoLocal())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Equipo local no encontrado con id: " + request.getIdEquipoLocal()));
@@ -88,6 +113,8 @@ public class PartidoServiceImpl implements PartidoService {
         Equipo visitante = equipoRepository.findById(request.getIdEquipoVisitante())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Equipo visitante no encontrado con id: " + request.getIdEquipoVisitante()));
+
+
 
         List<Pronostico> pronosticosDelPartido = pronosticoRepository.findByPartido(partido);
 
