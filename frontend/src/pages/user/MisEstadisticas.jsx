@@ -49,7 +49,7 @@ function MisEstadisticas() {
         ) : !stats ? null : stats.totalPronosticos === 0 ? (
           <div className="dash-card">
             <div className="stats-empty">
-              <span className="big-icon">📊</span>
+              <span className="big-icon"></span>
               <p>Todavía no realizaste ningún pronóstico.</p>
               <p>¡Empezá a predecir para ver tus estadísticas aquí!</p>
             </div>
@@ -58,37 +58,37 @@ function MisEstadisticas() {
           <>
             <div className="stats-grid">
               <div className="stat-card">
-                <span className="stat-icon">🎯</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value">{stats.totalPronosticos}</span>
                 <span className="stat-label">Pronósticos realizados</span>
               </div>
 
               <div className="stat-card">
-                <span className="stat-icon">🏆</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value green">{stats.plenos}</span>
                 <span className="stat-label">Plenos (resultado exacto)</span>
               </div>
 
               <div className="stat-card">
-                <span className="stat-icon">✅</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value yellow">{stats.aciertos}</span>
                 <span className="stat-label">Aciertos de tendencia</span>
               </div>
 
               <div className="stat-card">
-                <span className="stat-icon">❌</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value red">{stats.incorrectos}</span>
                 <span className="stat-label">Pronósticos incorrectos</span>
               </div>
 
               <div className="stat-card">
-                <span className="stat-icon">⏳</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value gray">{stats.pendientes}</span>
                 <span className="stat-label">Pendientes de resolución</span>
               </div>
 
               <div className="stat-card">
-                <span className="stat-icon">⭐</span>
+                <span className="stat-icon"></span>
                 <span className="stat-value purple">{stats.puntosTotales}</span>
                 <span className="stat-label">Puntos totales acumulados</span>
               </div>
