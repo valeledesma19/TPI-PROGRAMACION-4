@@ -296,21 +296,7 @@ Las pruebas del sistema fueron realizadas utilizando:
 
 ---
 
-# 🌎 Deploy
 
-Frontend:
-
-- Vercel
-
-Backend:
-
-- Render
-
-Base de datos:
-
-- PostgreSQL
-
----
 
 # 🔮 Mejoras futuras
 
@@ -330,9 +316,4 @@ Proyecto desarrollado con fines educativos y como proyecto personal de portfolio
 
 ---
 
-# 👩‍💻 Autor
 
-**Valentina Ledesma**
-
-GitHub:
-https://github.com/valeledesma19
