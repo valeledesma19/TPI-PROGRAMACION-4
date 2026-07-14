@@ -3,38 +3,56 @@
 <img width="2480" height="915" alt="Diagrama en blanco (3)" src="https://github.com/user-attachments/assets/ddc1786f-ee7d-44e0-b46f-e60e740d1128" />
 
 
-# 🏟️ Sports Booking Platform
+# ⚽ Prode Deportivo
 
-Sistema web Full Stack para la gestión y reserva de canchas deportivas.
+Sistema web de predicciones deportivas donde los usuarios pueden realizar pronósticos sobre partidos, consultar resultados y competir dentro de un ranking según sus aciertos.
 
-La aplicación permite a los usuarios consultar canchas disponibles, seleccionar horarios, realizar reservas y administrar sus turnos. Además, cuenta con un panel administrativo donde se pueden gestionar canchas y reservas.
+El sistema permite administrar partidos, equipos y resultados, además de gestionar las predicciones de los usuarios aplicando reglas de negocio como el cierre de pronósticos antes del inicio del partido.
 
-El proyecto fue desarrollado utilizando **Java con Spring Boot** para el backend y **React con Vite** para el frontend, implementando autenticación segura mediante JWT y una base de datos PostgreSQL.
+Proyecto desarrollado como aplicación Full Stack utilizando **Java + Spring Boot** para el backend y **React + Vite** para el frontend.
 
 ---
 
 # 🚀 Funcionalidades
 
-## 👤 Usuario
+## 👤 Usuarios
 
-- Registro de usuarios.
-- Inicio de sesión.
+- Registro e inicio de sesión.
 - Autenticación mediante JWT.
-- Consulta de canchas disponibles.
-- Visualización de horarios libres.
-- Creación de reservas.
-- Consulta de reservas realizadas.
-- Cancelación de reservas propias.
+- Visualización de partidos disponibles.
+- Carga de predicciones.
+- Consulta de predicciones realizadas.
+- Visualización de resultados de partidos.
+- Sistema de puntuación según aciertos.
 
-## 🔐 Administrador
+---
 
-- Inicio de sesión administrativo.
-- Gestión de canchas deportivas.
-- Crear nuevas canchas.
-- Modificar información de canchas.
-- Eliminar canchas.
-- Visualización de reservas.
-- Administración general del sistema.
+## 🔐 Administradores
+
+- Gestión de equipos.
+- Gestión de fechas y partidos.
+- Carga de resultados finales.
+- Administración del estado de los partidos.
+- Control de información del torneo.
+
+---
+
+# ⚙️ Reglas de negocio implementadas
+
+- Los usuarios pueden realizar predicciones únicamente antes del horario límite establecido.
+- Las predicciones se bloquean 30 minutos antes del comienzo del partido.
+- Un usuario no puede modificar una predicción una vez cerrada.
+- Los partidos manejan diferentes estados:
+
+```
+POR JUGARSE
+EN JUEGO
+FINALIZADO
+```
+
+- No se permiten partidos duplicados entre los mismos equipos en la misma fecha.
+- Los resultados son cargados únicamente por administradores.
+- Las predicciones se utilizan para calcular los puntos obtenidos por cada usuario.
 
 ---
 
@@ -46,12 +64,11 @@ El proyecto fue desarrollado utilizando **Java con Spring Boot** para el backend
 - Spring Boot
 - Spring Security
 - JWT (JSON Web Token)
-- BCrypt para encriptación de contraseñas
+- BCrypt
 - Spring Data JPA
 - Hibernate
 - PostgreSQL
 - Maven
-- Swagger
 
 ## Frontend
 
@@ -59,24 +76,23 @@ El proyecto fue desarrollado utilizando **Java con Spring Boot** para el backend
 - Vite
 - JavaScript
 - React Router
-- Axios / Fetch API
+- Fetch API
 - CSS
 
-## Herramientas utilizadas
+## Herramientas
 
 - IntelliJ IDEA
 - Visual Studio Code
+- Postman
 - Git
 - GitHub
-- Postman
-- Render
-- Vercel
+- Neon PostgreSQL 
 
 ---
 
 # 🏗️ Arquitectura del proyecto
 
-El backend está desarrollado siguiendo una arquitectura por capas:
+El backend está organizado siguiendo una arquitectura por capas:
 
 ```
 backend
@@ -94,7 +110,7 @@ backend
 └── security
 ```
 
-El frontend está organizado de la siguiente manera:
+Frontend:
 
 ```
 frontend
@@ -114,14 +130,15 @@ frontend
 
 # 🔒 Seguridad
 
-La aplicación implementa autenticación y autorización mediante JWT.
+El sistema implementa autenticación mediante JWT.
 
 Características:
 
-- Login seguro.
-- Tokens JWT para mantener la sesión.
-- Contraseñas protegidas mediante BCrypt.
-- Control de acceso mediante roles.
+- Inicio de sesión seguro.
+- Tokens JWT para validar usuarios.
+- Contraseñas almacenadas utilizando BCrypt.
+- Protección de endpoints mediante Spring Security.
+- Control de acceso según roles.
 
 Roles disponibles:
 
@@ -130,56 +147,49 @@ USER
 ADMIN
 ```
 
-Los endpoints están protegidos utilizando Spring Security.
-
----
-
-# 📅 Sistema de reservas
-
-El sistema cuenta con validaciones para evitar conflictos entre reservas.
-
-Antes de crear una reserva se verifica:
-
-- Cancha seleccionada.
-- Fecha elegida.
-- Horario disponible.
-- Existencia de una reserva previa.
-
-Los horarios ocupados no pueden volver a ser seleccionados por otros usuarios.
-
 ---
 
 # 🗄️ Base de datos
 
-La aplicación utiliza PostgreSQL.
+La aplicación utiliza PostgreSQL como sistema gestor de base de datos.
 
 Principales entidades:
 
 - Usuario
 - Rol
-- Cancha
-- Deporte
-- Reserva
-- Horario
+- Equipo
+- Partido
+- Fecha
+- Predicción
+- Resultado
 
 
 Relaciones principales:
 
 ```
-Usuario 1 -------- N Reserva
+Usuario 1 -------- N Predicción
 
-Cancha 1 -------- N Reserva
+Partido 1 -------- N Predicción
 
-Deporte 1 -------- N Cancha
+Equipo 1 -------- N Partido
 ```
+
+---
+
+# ⚽ Funcionamiento general
+
+1. El administrador crea las fechas y partidos del torneo.
+2. Los usuarios ingresan al sistema.
+3. Cada usuario realiza sus predicciones antes del cierre.
+4. Una vez iniciado el partido, las predicciones quedan bloqueadas.
+5. El administrador carga el resultado final.
+6. El sistema compara las predicciones con los resultados y calcula los puntos.
 
 ---
 
 # ⚙️ Instalación y ejecución
 
 ## Requisitos
-
-Antes de ejecutar el proyecto es necesario tener instalado:
 
 - Java 21
 - Node.js
@@ -190,13 +200,13 @@ Antes de ejecutar el proyecto es necesario tener instalado:
 
 # Backend
 
-Clonar el repositorio:
+Clonar repositorio:
 
 ```bash
-git clone https://github.com/valeledesma19/sports-booking-platform.git
+git clone https://github.com/valeledesma19/prode.git
 ```
 
-Ingresar al backend:
+Ingresar a la carpeta backend:
 
 ```bash
 cd backend
@@ -204,7 +214,7 @@ cd backend
 
 Configurar las variables de conexión a PostgreSQL.
 
-Ejecutar el proyecto:
+Ejecutar:
 
 ```bash
 mvn spring-boot:run
@@ -232,7 +242,7 @@ Instalar dependencias:
 npm install
 ```
 
-Ejecutar aplicación:
+Ejecutar:
 
 ```bash
 npm run dev
@@ -258,62 +268,57 @@ POST /api/auth/login
 
 ---
 
-## Canchas
+## Equipos
 
 ```
-GET /api/canchas
+GET /api/equipos
 
-POST /api/canchas
+POST /api/equipos
 
-PUT /api/canchas/{id}
+PUT /api/equipos/{id}
 
-DELETE /api/canchas/{id}
+DELETE /api/equipos/{id}
 ```
 
 ---
 
-## Reservas
+## Partidos
 
 ```
-GET /api/reservas
+GET /api/partidos
 
-POST /api/reservas
+POST /api/partidos
 
-DELETE /api/reservas/{id}
+PUT /api/partidos/{id}
+```
+
+---
+
+## Predicciones
+
+```
+GET /api/predicciones
+
+POST /api/predicciones
 ```
 
 ---
 
 # 🧪 Testing
 
-Las pruebas del sistema fueron realizadas utilizando:
+Se realizaron pruebas utilizando:
 
 - Postman para validar endpoints.
-- Pruebas de autenticación.
-- Validación de creación de reservas.
-- Validación de horarios ocupados.
-- Verificación de restricciones para evitar reservas duplicadas.
+- Pruebas de registro e inicio de sesión.
+- Validación de permisos según rol.
+- Pruebas de creación de partidos.
+- Validación de restricciones de predicciones.
+- Prueba de bloqueo de pronósticos antes del inicio del partido.
 
 ---
 
 
+Base de datos:
 
-# 🔮 Mejoras futuras
-
-- Integración con pagos online.
-- Calendario semanal interactivo.
-- Notificaciones por correo electrónico.
-- Recuperación de contraseña.
-- Sistema de favoritos.
-- Valoraciones y comentarios de canchas.
-- Dashboard administrativo con estadísticas.
-
----
-
-# 📄 Licencia
-
-Proyecto desarrollado con fines educativos y como proyecto personal de portfolio.
-
----
-
+- Neon PostgreSQL
 
